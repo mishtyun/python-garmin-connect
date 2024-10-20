@@ -3,9 +3,9 @@ import os
 import requests
 from garth.exc import GarthHTTPError
 
-from garminconnect import Garmin
-from src.configuration import garmin_connect_configuration
-from garminconnect.exceptions import GarminConnectAuthenticationError
+from .service import Garmin
+from .configuration import garmin_connect_configuration
+from .exceptions import GarminConnectAuthenticationError
 
 
 def get_mfa():
