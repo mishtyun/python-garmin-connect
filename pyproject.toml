@@ -19,5 +19,5 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/pypa/sampleproject"
-Issues = "https://github.com/pypa/sampleproject/issues"
+Homepage = "https://github.com/mishtyun/python-garmin-connect/"
+Issues = "https://github.com/mishtyun/python-garmin-connect/issues"
