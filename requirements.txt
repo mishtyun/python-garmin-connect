@@ -4,3 +4,8 @@ requests
 mypy
 pydantic
 pydantic-settings
+#python-dotenv
+
+twine
+wheel
+setuptools

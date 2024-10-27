@@ -9,13 +9,13 @@ from typing import Any, Dict, List, Optional, Union
 import garth
 from withings_sync import fit
 
-from src.configuration import GarminConnectConfiguration
-from src.constants import API_URLS, ACTIVITY_VISIBILITIES
-from src.exceptions import (
+from garmin_connect.configuration import GarminConnectConfiguration
+from garmin_connect.constants import API_URLS, ACTIVITY_VISIBILITIES
+from garmin_connect.exceptions import (
     GarminConnectInvalidFileFormatError,
     GarminConnectAuthenticationError,
 )
-from src.utils import get_caller_name
+from garmin_connect.utils import get_caller_name
 
 logger = logging.getLogger(__name__)
 
