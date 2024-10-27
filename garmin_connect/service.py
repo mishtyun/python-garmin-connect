@@ -30,13 +30,18 @@ class Garmin:
         prompt_mfa=None,
     ):
         """Create a new class instance."""
-
         self.username = garmin_configuration.email
         self.password = garmin_configuration.password
         self.tokenstore = garmin_configuration.tokenstore
 
         self.is_cn = is_cn
         self.prompt_mfa = prompt_mfa
+
+        self.display_name = None
+        self.full_name = None
+        self.unit_system = None
+
+        self.garth = garth.Client(domain="garmin.cn" if self.is_cn else "garmin.com")
 
         self.garmin_connect_hill_score_url = "/metrics-service/metrics/hillscore"
 
@@ -107,12 +112,6 @@ class Garmin:
         self.garmin_workouts = "/workout-service"
 
         self.garmin_connect_delete_activity_url = "/activity-service/activity"
-
-        self.garth = garth.Client(domain="garmin.cn" if is_cn else "garmin.com")
-
-        self.display_name = None
-        self.full_name = None
-        self.unit_system = None
 
     @staticmethod
     def get_url(**url_params) -> str:

@@ -1,9 +1,13 @@
 import inspect
 from typing import Literal
 
-__all__ = ["get_caller_name"]
+__all__ = ["get_mfa", "get_caller_name"]
 
 CALLER_NAME_FORMATS = Literal["module", "class", "method"]
+
+def get_mfa():
+    """Get MFA."""
+    return input("MFA one-time code: ")
 
 
 def get_caller_name(return_format: CALLER_NAME_FORMATS = "method", skip: int = 2):
