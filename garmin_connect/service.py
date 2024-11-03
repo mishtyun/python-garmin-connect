@@ -45,26 +45,14 @@ class Garmin:
 
         self.garmin_connect_hill_score_url = "/metrics-service/metrics/hillscore"
 
-        self.garmin_connect_set_blood_pressure_endpoint = (
-            "/bloodpressure-service/bloodpressure"
-        )
-
         self.garmin_connect_endurance_score_url = (
             "/metrics-service/metrics/endurancescore"
         )
-        self.garmin_connect_menstrual_calendar_url = (
-            "/periodichealth-service/menstrualcycle/calendar"
-        )
 
-        self.garmin_connect_menstrual_dayview_url = (
-            "/periodichealth-service/menstrualcycle/dayview"
-        )
         self.garmin_connect_pregnancy_snapshot_url = (
             "periodichealth-service/menstrualcycle/pregnancysnapshot"
         )
         self.garmin_connect_goals_url = "/goal-service/goal/goals"
-
-        self.garmin_connect_rhr_url = "/userstats-service/wellness/daily"
 
         self.garmin_connect_hrv_url = "/hrv-service/hrv"
 
@@ -90,13 +78,6 @@ class Garmin:
         self.garmin_connect_daily_respiration_url = (
             "/wellness-service/wellness/daily/respiration"
         )
-        self.garmin_connect_daily_spo2_url = "/wellness-service/wellness/daily/spo2"
-        self.garmin_all_day_stress_url = "/wellness-service/wellness/dailyStress"
-        self.garmin_daily_events_url = "/wellness-service/wellness/dailyEvents"
-
-        self.garmin_connect_activity_fordate = "/mobile-gateway/heartRate/forDate"
-        self.garmin_connect_fitnessstats = "/fitnessstats-service/activity"
-        self.garmin_connect_fitnessage = "/fitnessage-service/fitnessage"
 
         self.garmin_connect_fit_download = "/download-service/files/activity"
         self.garmin_connect_tcx_download = "/download-service/export/tcx/activity"
@@ -384,7 +365,7 @@ class Garmin:
         Add blood pressure measurement
         """
 
-        url = f"{self.garmin_connect_set_blood_pressure_endpoint}"
+        url = self.get_url()
         dt = datetime.fromisoformat(timestamp) if timestamp else datetime.now()
         # Apply timezone offset to get UTC/GMT time
         dtGMT = dt.astimezone(timezone.utc)
@@ -481,7 +462,7 @@ class Garmin:
     def get_spo2_data(self, cdate: str) -> Dict[str, Any]:
         """Return available SpO2 data 'cdate' format 'YYYY-MM-DD'."""
 
-        url = f"{self.garmin_connect_daily_spo2_url}/{cdate}"
+        url = self.get_url(cdate=cdate)
         logger.debug("Requesting SpO2 data")
 
         return self.connectapi(url)
@@ -489,7 +470,7 @@ class Garmin:
     def get_all_day_stress(self, cdate: str) -> Dict[str, Any]:
         """Return available all day stress data 'cdate' format 'YYYY-MM-DD'."""
 
-        url = f"{self.garmin_all_day_stress_url}/{cdate}"
+        url = self.get_url(cdate=cdate)
         logger.debug("Requesting all day stress data")
 
         return self.connectapi(url)
@@ -500,7 +481,7 @@ class Garmin:
         Includes autodetected activities, even if not recorded on the watch
         """
 
-        url = f"{self.garmin_daily_events_url}?calendarDate={cdate}"
+        url = self.get_url(cdate=cdate)
         logger.debug("Requesting all day stress data")
 
         return self.connectapi(url)
@@ -585,7 +566,7 @@ class Garmin:
     def get_rhr_day(self, cdate: str) -> Dict[str, Any]:
         """Return resting heartrate data for current user."""
 
-        url = f"{self.garmin_connect_rhr_url}/{self.display_name}"
+        url = self.get_url(display_name=self.display_name)
         params = {
             "fromDate": str(cdate),
             "untilDate": str(cdate),
@@ -685,20 +666,20 @@ class Garmin:
     def get_fitnessage_data(self, cdate: str) -> Dict[str, Any]:
         """Return Fitness Age data for current user."""
 
-        url = f"{self.garmin_connect_fitnessage}/{cdate}"
+        url = self.get_url(cdate=cdate)
         logger.debug("Requesting Fitness Age data")
 
         return self.connectapi(url)
 
-    def get_hill_score(self, startdate: str, enddate=None):
+    def get_hill_score(self, start_date: str, end_date=None):
         """
         Return hill score by day from 'startdate' format 'YYYY-MM-DD'
         to enddate 'YYYY-MM-DD'
         """
 
-        if enddate is None:
+        if end_date is None:
             url = self.garmin_connect_hill_score_url
-            params = {"calendarDate": str(startdate)}
+            params = {"calendarDate": str(start_date)}
             logger.debug("Requesting hill score data for a single day")
 
             return self.connectapi(url, params=params)
@@ -706,8 +687,8 @@ class Garmin:
         else:
             url = f"{self.garmin_connect_hill_score_url}/stats"
             params = {
-                "startDate": str(startdate),
-                "endDate": str(enddate),
+                "startDate": str(start_date),
+                "endDate": str(end_date),
                 "aggregation": "daily",
             }
             logger.debug("Requesting hill score data for a range of days")
@@ -786,11 +767,11 @@ class Garmin:
 
         return self.connectapi(url, params=params)
 
-    def get_activities_fordate(self, fordate: str):
+    def get_activities_fordate(self, for_date: str):
         """Return available activities for date."""
 
-        url = f"{self.garmin_connect_activity_fordate}/{fordate}"
-        logger.debug(f"Requesting activities for date {fordate}")
+        url = self.get_url(for_date=for_date)
+        logger.debug(f"Requesting activities for date {for_date}")
 
         return self.connectapi(url)
 
@@ -910,7 +891,7 @@ class Garmin:
         :return: list of JSON activities with their aggregated progress summary
         """
 
-        url = self.garmin_connect_fitnessstats
+        url = self.get_url()
         params = {
             "startDate": str(startdate),
             "endDate": str(enddate),
@@ -1165,20 +1146,20 @@ class Garmin:
     #     logger.debug("Uploading workout using %s", url)
 
     #     return self.garth.post("connectapi", url, json=workout_json, api=True)
-    def get_menstrual_data_for_date(self, fordate: str):
+    def get_menstrual_data_for_date(self, for_date: str):
         """Return menstrual data for date."""
 
-        url = f"{self.garmin_connect_menstrual_dayview_url}/{fordate}"
-        logger.debug(f"Requesting menstrual data for date {fordate}")
+        url = self.get_url(for_date=for_date)
+        logger.debug(f"Requesting menstrual data for date: {for_date}")
 
         return self.connectapi(url)
 
-    def get_menstrual_calendar_data(self, startdate: str, enddate: str):
-        """Return summaries of cycles that have days between startdate and enddate."""
+    def get_menstrual_calendar_data(self, start_date: str, end_date: str):
+        """Return summaries of cycles that have days between start_date and end_date."""
 
-        url = f"{self.garmin_connect_menstrual_calendar_url}/{startdate}/{enddate}"
+        url = self.get_url(start_date=start_date, end_date=end_date)
         logger.debug(
-            f"Requesting menstrual data for dates {startdate} through {enddate}"
+            f"Requesting menstrual data for dates {start_date} through {end_date}"
         )
 
         return self.connectapi(url)

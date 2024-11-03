@@ -52,5 +52,14 @@ API_URLS = {
     "get_body_battery": "/wellness-service/wellness/bodyBattery/reports/daily",
     "get_body_battery_events": "/wellness-service/wellness/bodyBattery/events/{cdate}",
     "get_blood_pressure": "/bloodpressure-service/bloodpressure/range/{start_date}/{end_date}",
-    # Download activity
+    "set_blood_pressure": "/bloodpressure-service/bloodpressure",
+    "get_menstrual_calendar_data": "/periodichealth-service/menstrualcycle/calendar/{start_date}/{end_date}",
+    "get_menstrual_data_for_date": "/periodichealth-service/menstrualcycle/dayview/{for_date}",
+    "get_rhr_day": "/userstats-service/wellness/daily/{display_name}",
+    "get_spo2_data": "/wellness-service/wellness/daily/spo2/{cdate}",
+    "get_all_day_stress": "/wellness-service/wellness/dailyStress/{cdate}",
+    "get_all_day_events": "/wellness-service/wellness/dailyEvents?calendarDate={cdate}",
+    "get_activities_fordate": "/mobile-gateway/heartRate/forDate/{for_date}",
+    "get_progress_summary_between_dates": "/fitnessstats-service/activity",
+    "get_fitnessage_data": "/fitnessage-service/fitnessage/{cdate}",
 }
