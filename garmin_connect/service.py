@@ -838,12 +838,12 @@ class Garmin:
             api=True,
         )
 
-    def get_activities_by_date(self, startdate, enddate, activitytype=None):
+    def get_activities_by_date(self, start_date, end_date, activity_type=None):
         """
         Fetch available activities between specific dates
-        :param startdate: String in the format YYYY-MM-DD
-        :param enddate: String in the format YYYY-MM-DD
-        :param activitytype: (Optional) Type of activity you are searching
+        :param start_date: String in the format YYYY-MM-DD
+        :param end_date: String in the format YYYY-MM-DD
+        :param activity_type: (Optional) Type of activity you are searching
                              Possible values are [cycling, running, swimming,
                              multi_sport, fitness_equipment, hiking, walking, other]
         :return: list of JSON activities
@@ -857,15 +857,15 @@ class Garmin:
         # and automatically loads more on scroll
         url = self.get_url()
         params = {
-            "startDate": str(startdate),
-            "endDate": str(enddate),
+            "startDate": str(start_date),
+            "endDate": str(end_date),
             "start": str(start),
             "limit": str(limit),
         }
-        if activitytype:
-            params["activityType"] = str(activitytype)
+        if activity_type:
+            params["activityType"] = str(activity_type)
 
-        logger.debug(f"Requesting activities by date from {startdate} to {enddate}")
+        logger.debug(f"Requesting activities by date from {start_date} to {end_date}")
         while True:
             params["start"] = str(start)
             logger.debug(f"Requesting activities {start} to {start+limit}")
@@ -879,28 +879,28 @@ class Garmin:
         return activities
 
     def get_progress_summary_between_dates(
-        self, startdate, enddate, metric="distance", groupbyactivities=True
+        self, start_date, end_date, metric="distance", group_by_activities=True
     ):
         """
         Fetch progress summary data between specific dates
-        :param startdate: String in the format YYYY-MM-DD
-        :param enddate: String in the format YYYY-MM-DD
+        :param start_date: String in the format YYYY-MM-DD
+        :param end_date: String in the format YYYY-MM-DD
         :param metric: metric to be calculated in the summary:
             "elevationGain", "duration", "distance", "movingDuration"
-        :param groupbyactivities: group the summary by activity type
+        :param group_by_activities: group the summary by activity type
         :return: list of JSON activities with their aggregated progress summary
         """
 
         url = self.get_url()
         params = {
-            "startDate": str(startdate),
-            "endDate": str(enddate),
+            "startDate": str(start_date),
+            "endDate": str(end_date),
             "aggregation": "lifetime",
-            "groupByParentActivityType": str(groupbyactivities),
+            "groupByParentActivityType": str(group_by_activities),
             "metric": str(metric),
         }
 
-        logger.debug(f"Requesting fitnessstats by date from {startdate} to {enddate}")
+        logger.debug(f"Requesting fitness-stats by date from {start_date} to {end_date}")
         return self.connectapi(url, params=params)
 
     def get_activity_types(self):
