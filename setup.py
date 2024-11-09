@@ -8,7 +8,7 @@ with open(path.join(working_directory, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name="garmin_connect",
-    version="0.0.1",
+    version="0.0.2",
     author="Mikita Hushtyn",
     author_email="mikita.hushtyn.dev@outlook.com",
     url="https://github.com/mishtyun/python-garmin-connect/",
