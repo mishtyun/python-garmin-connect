@@ -199,16 +199,16 @@ class Garmin:
             **self.get_body_composition(cdate)["totalAverage"],
         }
 
-    def get_body_composition(self, startdate: str, enddate=None) -> Dict[str, Any]:
+    def get_body_composition(self, start_date: str, end_date=None) -> Dict[str, Any]:
         """
-        Return available body composition data for 'startdate' format
-        'YYYY-MM-DD' through enddate 'YYYY-MM-DD'.
+        Return available body composition data for 'start_date' format
+        'YYYY-MM-DD' through end_date 'YYYY-MM-DD'.
         """
 
-        if enddate is None:
-            enddate = startdate
+        if end_date is None:
+            end_date = start_date
         url = self.get_url()
-        params = {"startDate": str(startdate), "endDate": str(enddate)}
+        params = {"startDate": str(start_date), "endDate": str(end_date)}
         logger.debug("Requesting body composition")
 
         return self.connectapi(url, params=params)
@@ -275,10 +275,10 @@ class Garmin:
 
         return self.garth.post("connectapi", url, json=payload)
 
-    def get_weigh_ins(self, startdate: str, enddate: str):
-        """Get weigh-ins between startdate and enddate using format 'YYYY-MM-DD'."""
+    def get_weigh_ins(self, start_date: str, end_date: str):
+        """Get weigh-ins between start_date and end_date using format 'YYYY-MM-DD'."""
 
-        url = self.get_url(startdate=startdate, enddate=enddate)
+        url = self.get_url(start_date=start_date, end_date=end_date)
         params = {"includeAll": True}
         logger.debug("Requesting weigh-ins")
 
@@ -329,13 +329,13 @@ class Garmin:
 
         return len(weigh_ins)
 
-    def get_body_battery(self, startdate: str, enddate=None) -> List[Dict[str, Any]]:
+    def get_body_battery(self, start_date: str, end_date=None) -> List[Dict[str, Any]]:
         """
-        Return body battery values by day for 'startdate' format
-        'YYYY-MM-DD' through enddate 'YYYY-MM-DD'
+        Return body battery values by day for 'start_date' format
+        'YYYY-MM-DD' through end_date 'YYYY-MM-DD'
         """
-        enddate = enddate if enddate is not None else startdate
-        params = {"startDate": str(startdate), "endDate": str(enddate)}
+        end_date = end_date if end_date is not None else start_date
+        params = {"startDate": str(start_date), "endDate": str(end_date)}
 
         url = self.get_url()
         logger.debug("Requesting body battery data")
@@ -592,32 +592,32 @@ class Garmin:
 
         return self.connectapi(url)
 
-    def get_endurance_score(self, startdate: str, enddate=None):
+    def get_endurance_score(self, start_date: str, end_date=None):
         """
-        Return endurance score by day for 'startdate' format 'YYYY-MM-DD'
-        through enddate 'YYYY-MM-DD'.
+        Return endurance score by day for 'start_date' format 'YYYY-MM-DD'
+        through end_date 'YYYY-MM-DD'.
         Using a single day returns the precise values for that day.
         Using a range returns the aggregated weekly values for that week.
         """
 
-        if enddate is None:
+        if end_date is None:
             url = self.garmin_connect_endurance_score_url
-            params = {"calendarDate": str(startdate)}
+            params = {"calendarDate": str(start_date)}
             logger.debug("Requesting endurance score data for a single day")
 
             return self.connectapi(url, params=params)
         else:
             url = f"{self.garmin_connect_endurance_score_url}/stats"
             params = {
-                "startDate": str(startdate),
-                "endDate": str(enddate),
+                "startDate": str(start_date),
+                "endDate": str(end_date),
                 "aggregation": "weekly",
             }
             logger.debug("Requesting endurance score data for a range of days")
 
             return self.connectapi(url, params=params)
 
-    def get_race_predictions(self, startdate=None, enddate=None, _type=None):
+    def get_race_predictions(self, start_date=None, end_date=None, _type=None):
         """
         Return race predictions for the 5k, 10k, half marathon and marathon.
         Accepts either 0 parameters or all three:
@@ -625,9 +625,9 @@ class Garmin:
         Or returns the race predictions for each day or month in the range provided
 
         Keyword Arguments:
-        'startdate' the date of the earliest race predictions
-        Cannot be more than one year before 'enddate'
-        'enddate' the date of the last race predictions
+        'start_date' the date of the earliest race predictions
+        Cannot be more than one year before 'end_date'
+        'end_date' the date of the last race predictions
         '_type' either 'daily' (the predictions for each day in the range) or
         'monthly' (the aggregated monthly prediction for each month in the range)
         """
@@ -636,19 +636,19 @@ class Garmin:
         if _type not in valid:
             raise ValueError("results: _type must be one of %r." % valid)
 
-        if _type is None and startdate is None and enddate is None:
+        if _type is None and start_date is None and end_date is None:
             url = (
                 self.garmin_connect_race_predictor_url + f"/latest/{self.display_name}"
             )
             return self.connectapi(url)
 
-        elif _type is not None and startdate is not None and enddate is not None:
+        elif _type is not None and start_date is not None and end_date is not None:
             url = (
                 self.garmin_connect_race_predictor_url + f"/{_type}/{self.display_name}"
             )
             params = {
-                "fromCalendarDate": str(startdate),
-                "toCalendarDate": str(enddate),
+                "fromCalendarDate": str(start_date),
+                "toCalendarDate": str(end_date),
             }
             return self.connectapi(url, params=params)
 
@@ -673,8 +673,8 @@ class Garmin:
 
     def get_hill_score(self, start_date: str, end_date=None):
         """
-        Return hill score by day from 'startdate' format 'YYYY-MM-DD'
-        to enddate 'YYYY-MM-DD'
+        Return hill score by day from 'start_date' format 'YYYY-MM-DD'
+        to end_date 'YYYY-MM-DD'
         """
 
         if end_date is None:
@@ -722,11 +722,11 @@ class Garmin:
         return self.connectapi(url)
 
     def get_device_solar_data(
-        self, device_id: str, startdate: str, enddate=None
+        self, device_id: str, start_date: str, end_date=None
     ) -> Dict[str, Any]:
         """Return solar data for compatible device with 'device_id'"""
-        if enddate is None:
-            enddate = startdate
+        if end_date is None:
+            end_date = start_date
             single_day = True
         else:
             single_day = False
