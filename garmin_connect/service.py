@@ -6,7 +6,6 @@ from datetime import date, datetime, timezone
 from enum import Enum, auto
 from typing import Any, Dict, List, Optional, Union
 
-import garth
 from withings_sync import fit
 
 from garmin_connect.configuration import GarminConnectConfiguration
@@ -15,6 +14,8 @@ from garmin_connect.exceptions import (
     GarminConnectInvalidFileFormatError,
     GarminConnectAuthenticationError,
 )
+from garmin_connect.http_client import GarminConnectHTTPClient
+from garmin_connect.repository import BaseOAuthRepository
 from garmin_connect.utils import get_caller_name
 
 logger = logging.getLogger(__name__)
@@ -24,24 +25,25 @@ class Garmin:
     """Class for fetching data from Garmin Connect."""
 
     def __init__(
-        self,
-        garmin_configuration: GarminConnectConfiguration,
-        is_cn=False,
-        prompt_mfa=None,
+            self,
+            oauth_repository: BaseOAuthRepository,
+            garmin_configuration: GarminConnectConfiguration,
+            prompt_mfa=None,
     ):
         """Create a new class instance."""
         self.username = garmin_configuration.email
         self.password = garmin_configuration.password
-        self.tokenstore = garmin_configuration.tokenstore
 
-        self.is_cn = is_cn
         self.prompt_mfa = prompt_mfa
 
         self.display_name = None
         self.full_name = None
         self.unit_system = None
 
-        self.garth = garth.Client(domain="garmin.cn" if self.is_cn else "garmin.com")
+        self.garth = GarminConnectHTTPClient(
+            repository=oauth_repository,
+            domain="garmin.com"
+        )
 
         self.garmin_connect_hill_score_url = "/metrics-service/metrics/hillscore"
 
@@ -105,19 +107,15 @@ class Garmin:
     def download(self, path, **kwargs):
         return self.garth.download(path, **kwargs)
 
-    def login(self):
+    def login(self, use_creds: bool = False):
         """Log in using Garth."""
-
-        if self.tokenstore:
-            if len(self.tokenstore) > 512:
-                self.garth.loads(self.tokenstore)
-            else:
-                self.garth.load(self.tokenstore)
+        if use_creds:
+            self.garth.login(self.username, self.password)
         else:
-            self.garth.login(self.username, self.password, prompt_mfa=self.prompt_mfa)
+            self.garth.loads()
 
-        self.display_name = self.garth.profile["displayName"]
-        self.full_name = self.garth.profile["fullName"]
+        self.display_name = self.garth.profile.get("displayName")
+        self.full_name = self.garth.profile.get("fullName")
 
         user_settings_url = self.get_url()
         settings = self.garth.connectapi(user_settings_url)
@@ -214,20 +212,20 @@ class Garmin:
         return self.connectapi(url, params=params)
 
     def add_body_composition(
-        self,
-        timestamp: Optional[str],
-        weight: float,
-        percent_fat: Optional[float] = None,
-        percent_hydration: Optional[float] = None,
-        visceral_fat_mass: Optional[float] = None,
-        bone_mass: Optional[float] = None,
-        muscle_mass: Optional[float] = None,
-        basal_met: Optional[float] = None,
-        active_met: Optional[float] = None,
-        physique_rating: Optional[float] = None,
-        metabolic_age: Optional[float] = None,
-        visceral_fat_rating: Optional[float] = None,
-        bmi: Optional[float] = None,
+            self,
+            timestamp: Optional[str],
+            weight: float,
+            percent_fat: Optional[float] = None,
+            percent_hydration: Optional[float] = None,
+            visceral_fat_mass: Optional[float] = None,
+            bone_mass: Optional[float] = None,
+            muscle_mass: Optional[float] = None,
+            basal_met: Optional[float] = None,
+            active_met: Optional[float] = None,
+            physique_rating: Optional[float] = None,
+            metabolic_age: Optional[float] = None,
+            visceral_fat_rating: Optional[float] = None,
+            bmi: Optional[float] = None,
     ):
         dt = datetime.fromisoformat(timestamp) if timestamp else datetime.now()
         fitEncoder = fit.FitEncoderWeight()
@@ -354,12 +352,12 @@ class Garmin:
         return self.connectapi(url)
 
     def set_blood_pressure(
-        self,
-        systolic: int,
-        diastolic: int,
-        pulse: int,
-        timestamp: str = "",
-        notes: str = "",
+            self,
+            systolic: int,
+            diastolic: int,
+            pulse: int,
+            timestamp: str = "",
+            notes: str = "",
     ):
         """
         Add blood pressure measurement
@@ -405,7 +403,7 @@ class Garmin:
         return self.connectapi(url)
 
     def add_hydration_data(
-        self, value_in_ml: float, timestamp=None, cdate: Optional[str] = None
+            self, value_in_ml: float, timestamp=None, cdate: Optional[str] = None
     ) -> Dict[str, Any]:
         """Add hydration data in ml.  Defaults to current date and current timestamp if left empty
         :param float required - value_in_ml: The number of ml of water you wish to add (positive) or subtract (negative)
@@ -638,13 +636,13 @@ class Garmin:
 
         if _type is None and start_date is None and end_date is None:
             url = (
-                self.garmin_connect_race_predictor_url + f"/latest/{self.display_name}"
+                    self.garmin_connect_race_predictor_url + f"/latest/{self.display_name}"
             )
             return self.connectapi(url)
 
         elif _type is not None and start_date is not None and end_date is not None:
             url = (
-                self.garmin_connect_race_predictor_url + f"/{_type}/{self.display_name}"
+                    self.garmin_connect_race_predictor_url + f"/{_type}/{self.display_name}"
             )
             params = {
                 "fromCalendarDate": str(start_date),
@@ -722,7 +720,7 @@ class Garmin:
         return self.connectapi(url)
 
     def get_device_solar_data(
-        self, device_id: str, start_date: str, end_date=None
+            self, device_id: str, start_date: str, end_date=None
     ) -> Dict[str, Any]:
         """Return solar data for compatible device with 'device_id'"""
         if end_date is None:
@@ -784,7 +782,7 @@ class Garmin:
         return self.garth.put("connectapi", url, json=payload, api=True)
 
     def change_activity_visibility(
-        self, activity_id: Union[int, str], visibility: ACTIVITY_VISIBILITIES
+            self, activity_id: Union[int, str], visibility: ACTIVITY_VISIBILITIES
     ):
         url = self.get_url(activity_id=activity_id)
 
@@ -811,7 +809,7 @@ class Garmin:
         file_base_name = os.path.basename(activity_path)
         file_extension = file_base_name.split(".")[-1]
         allowed_file_extension = (
-            file_extension.upper() in Garmin.ActivityUploadFormat.__members__
+                file_extension.upper() in Garmin.ActivityUploadFormat.__members__
         )
 
         if allowed_file_extension:
@@ -868,7 +866,7 @@ class Garmin:
         logger.debug(f"Requesting activities by date from {start_date} to {end_date}")
         while True:
             params["start"] = str(start)
-            logger.debug(f"Requesting activities {start} to {start+limit}")
+            logger.debug(f"Requesting activities {start} to {start + limit}")
             act = self.connectapi(url, params=params)
             if act:
                 activities.extend(act)
@@ -879,7 +877,7 @@ class Garmin:
         return activities
 
     def get_progress_summary_between_dates(
-        self, start_date, end_date, metric="distance", group_by_activities=True
+            self, start_date, end_date, metric="distance", group_by_activities=True
     ):
         """
         Fetch progress summary data between specific dates

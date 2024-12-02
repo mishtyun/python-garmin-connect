@@ -12,7 +12,6 @@ class GarminConnectConfiguration(BaseSettings):
     email: str
     password: str
     tokenstore: str = Field(default="~/.garminconnect")
-    tokenstore_base64: str = Field(default="~/.garminconnect_base64")
 
 
 garmin_connect_configuration = GarminConnectConfiguration()
