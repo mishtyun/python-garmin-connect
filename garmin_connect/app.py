@@ -12,8 +12,7 @@ from garmin_connect.utils import get_mfa
 logger = logging.getLogger(__name__)
 
 
-
-def init_api(oauth_repo: BaseOAuthRepository, garmin_connect_configuration: GarminConnectConfiguration):
+def init_api(*, oauth_repo: BaseOAuthRepository, garmin_connect_configuration: GarminConnectConfiguration):
     """Initialize Garmin API with your credentials."""
 
     try:
@@ -44,10 +43,10 @@ def init_api(oauth_repo: BaseOAuthRepository, garmin_connect_configuration: Garm
                 f"Oauth tokens stored in tokenstore directory for future use. (first method)\n"
             )
         except (
-            FileNotFoundError,
-            GarthHTTPError,
-            GarminConnectAuthenticationError,
-            requests.exceptions.HTTPError,
+                FileNotFoundError,
+                GarthHTTPError,
+                GarminConnectAuthenticationError,
+                requests.exceptions.HTTPError,
         ) as err:
             logger.error(err)
             return None

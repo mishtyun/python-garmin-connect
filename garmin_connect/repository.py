@@ -6,7 +6,7 @@ import json
 from garth.utils import asdict
 from garth.auth_tokens import OAuth1Token, OAuth2Token
 
-__all__ = ["BaseOAuthRepository"]
+__all__ = ["BaseOAuthRepository", "FileOAuthRepository"]
 
 logger = logging.getLogger(__name__)
 
