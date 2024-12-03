@@ -3,9 +3,9 @@ import logging
 import requests
 from garth.exc import GarthHTTPError
 
-from garmin_connect.repository import FileOAuthRepository
+from garmin_connect.repository import BaseOAuthRepository
 from garmin_connect.service import Garmin
-from garmin_connect.configuration import garmin_connect_configuration
+from garmin_connect.configuration import GarminConnectConfiguration
 from garmin_connect.exceptions import GarminConnectAuthenticationError
 from garmin_connect.utils import get_mfa
 
@@ -13,10 +13,8 @@ logger = logging.getLogger(__name__)
 
 
 
-def init_api():
+def init_api(oauth_repo: BaseOAuthRepository, garmin_connect_configuration: GarminConnectConfiguration):
     """Initialize Garmin API with your credentials."""
-
-    oauth_repo = FileOAuthRepository(garmin_connect_configuration.tokenstore)
 
     try:
         logger.info(
