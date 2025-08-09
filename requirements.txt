@@ -1,11 +1,9 @@
-garth>=0.4.45
-withings-sync>=4.2.4
+setuptools
+wheel
+twine
+
+garth==0.5.17
 requests
 mypy
 pydantic
 pydantic-settings
-#python-dotenv
-
-twine
-wheel
-setuptools
