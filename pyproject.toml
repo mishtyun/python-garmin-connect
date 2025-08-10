@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["garmin_connect"]
+
+[project]
+name = "garmin_connect"
+version = "0.0.8"
+description = "Client library for Garmin Connect API"
+readme = "README.md"
+authors = [
+    { name = "Mikita Hushtyn", email = "mikita.hushtyn.dev@outlook.com" }
+]
+license-files = ["LICENSE.txt"]
+requires-python = ">=3.11"
+
+dependencies = [
+    "garth>=0.5.17",
+    "requests",
+    "pydantic",
+    "pydantic-settings"
+]
+
+[project.urls]
+Homepage = "https://github.com/mishtyun/python-garmin-connect/"
+Repository = "https://github.com/mishtyun/python-garmin-connect/"
