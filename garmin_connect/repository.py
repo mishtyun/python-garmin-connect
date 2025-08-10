@@ -1,10 +1,11 @@
+import json
 import logging
 import os
 from abc import ABC, abstractmethod
 from typing import Tuple
-import json
-from garth.utils import asdict
+
 from garth.auth_tokens import OAuth1Token, OAuth2Token
+from garth.utils import asdict
 
 __all__ = ["BaseOAuthRepository", "FileOAuthRepository"]
 
@@ -40,14 +41,20 @@ class FileOAuthRepository(BaseOAuthRepository):
     def set_oauth(self, oauth1_token: OAuth1Token, oauth2_token: OAuth2Token) -> bool:
         if oauth1_token:
             path = os.path.join(self.dir_path, "oauth1_token.json")
-            os.remove(path)
 
-            with open(path, "w", encoding='utf-8') as f:
+            if os.path.exists(path):
+                logger.debug("Removing old oauth1_token.json file")
+                os.remove(path)
+
+            with open(path, "w", encoding="utf-8") as f:
                 json.dump(asdict(oauth1_token), f, ensure_ascii=False, indent=4)
 
         if oauth2_token:
             path = os.path.join(self.dir_path, "oauth2_token.json")
-            os.remove(path)
 
-            with open(path, "w", encoding='utf-8') as f:
+            if os.path.exists(path):
+                logger.debug("Removing old oauth2_token.json file")
+                os.remove(path)
+
+            with open(path, "w", encoding="utf-8") as f:
                 json.dump(asdict(oauth2_token), f, ensure_ascii=False, indent=4)
