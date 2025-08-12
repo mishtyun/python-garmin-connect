@@ -1,6 +1,5 @@
 """Python 3 API wrapper for Garmin Connect."""
 
-io
 import logging
 import os
 from datetime import date, datetime, timezone
