@@ -1,10 +1,11 @@
 """Python 3 API wrapper for Garmin Connect."""
 
+io
 import logging
 import os
 from datetime import date, datetime, timezone
 from enum import Enum, auto
-from typing import Any, Dict, List, Optional, Union
+from typing import IO, Any, Dict, List, Optional, Union
 
 from garmin_connect import fit
 from garmin_connect.configuration import GarminConnectConfiguration
@@ -802,7 +803,6 @@ class Garmin:
 
     def upload_activity(self, activity_path: str):
         """Upload activity in fit format from file."""
-        # This code is borrowed from python-garminconnect-enhanced ;-)
 
         file_base_name = os.path.basename(activity_path)
         file_extension = file_base_name.split(".")[-1]
@@ -819,6 +819,27 @@ class Garmin:
         else:
             raise GarminConnectInvalidFileFormatError(
                 f"Could not upload {activity_path}"
+            )
+
+    def upload_activity_from_binary(
+        self, activity_name: str, activity_binary: IO[bytes]
+    ):
+        """Upload activity in fit format from binary"""
+
+        file_extension = activity_name.split(".")[-1]
+        allowed_file_extension = (
+            file_extension.upper() in Garmin.ActivityUploadFormat.__members__
+        )
+
+        if allowed_file_extension:
+            files = {
+                "file": (activity_name, activity_binary),
+            }
+            url = self.get_url()
+            return self.garth.post("connectapi", url, files=files, api=True)
+        else:
+            raise GarminConnectInvalidFileFormatError(
+                f"Could not upload {activity_name} from binary"
             )
 
     def delete_activity(self, activity_id):
