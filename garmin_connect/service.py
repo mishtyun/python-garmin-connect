@@ -833,7 +833,7 @@ class Garmin:
 
         if allowed_file_extension:
             files = {
-                "file": (activity_name, activity_binary),
+                "file": (activity_name, activity_binary.read()),
             }
             url = self.get_url()
             return self.garth.post("connectapi", url, files=files, api=True)
