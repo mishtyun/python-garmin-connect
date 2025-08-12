@@ -128,3 +128,7 @@ dmypy.json
 
 # Ignore folder for local testing
 ignore/
+
+
+# Ignore text files
+*.txt

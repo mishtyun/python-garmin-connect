@@ -7,7 +7,7 @@ include = ["garmin_connect"]
 
 [project]
 name = "garmin_connect"
-version = "0.0.9"
+version = "0.0.9.1"
 description = "Client library for Garmin Connect API"
 readme = "README.md"
 authors = [
