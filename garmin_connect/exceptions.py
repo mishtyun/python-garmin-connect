@@ -1,8 +1,12 @@
+from garth.exc import GarthException, GarthHTTPError
+
 __all__ = [
     "GarminConnectConnectionError",
     "GarminConnectTooManyRequestsError",
     "GarminConnectAuthenticationError",
     "GarminConnectInvalidFileFormatError",
+    "GarthHTTPError",
+    "GarthException",
 ]
 
 
